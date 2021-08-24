@@ -32,6 +32,16 @@ func main() {
 			fmt.Fprintln(w, widget)
 		}
 	})
+	http.HandleFunc("/widgets", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodPost {
+			err := client.Widget.Create().Exec(r.Context())
+			if err != nil {
+				fmt.Fprintln(w, err)
+			} else {
+				fmt.Fprintln(w, "ok")
+			}
+		}
+	})
 
 	port := os.Getenv("PORT")
 	if port == "" {
