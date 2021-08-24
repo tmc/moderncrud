@@ -15,12 +15,21 @@ var (
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"draft", "completed"}, Default: "draft"},
 		{Name: "priority", Type: field.TypeInt, Default: 0},
+		{Name: "widget_type", Type: field.TypeInt, Nullable: true},
 	}
 	// WidgetsTable holds the schema information for the "widgets" table.
 	WidgetsTable = &schema.Table{
 		Name:       "widgets",
 		Columns:    WidgetsColumns,
 		PrimaryKey: []*schema.Column{WidgetsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "widgets_widget_types_type",
+				Columns:    []*schema.Column{WidgetsColumns[5]},
+				RefColumns: []*schema.Column{WidgetTypesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
 	}
 	// WidgetTypesColumns holds the columns for the "widget_types" table.
 	WidgetTypesColumns = []*schema.Column{
@@ -40,4 +49,5 @@ var (
 )
 
 func init() {
+	WidgetsTable.ForeignKeys[0].RefTable = WidgetTypesTable
 }

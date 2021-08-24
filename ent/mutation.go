@@ -39,6 +39,8 @@ type WidgetMutation struct {
 	priority      *int
 	addpriority   *int
 	clearedFields map[string]struct{}
+	_type         *int
+	cleared_type  bool
 	done          bool
 	oldValue      func(context.Context) (*Widget, error)
 	predicates    []predicate.Widget
@@ -287,6 +289,45 @@ func (m *WidgetMutation) ResetPriority() {
 	m.addpriority = nil
 }
 
+// SetTypeID sets the "type" edge to the WidgetType entity by id.
+func (m *WidgetMutation) SetTypeID(id int) {
+	m._type = &id
+}
+
+// ClearType clears the "type" edge to the WidgetType entity.
+func (m *WidgetMutation) ClearType() {
+	m.cleared_type = true
+}
+
+// TypeCleared reports if the "type" edge to the WidgetType entity was cleared.
+func (m *WidgetMutation) TypeCleared() bool {
+	return m.cleared_type
+}
+
+// TypeID returns the "type" edge ID in the mutation.
+func (m *WidgetMutation) TypeID() (id int, exists bool) {
+	if m._type != nil {
+		return *m._type, true
+	}
+	return
+}
+
+// TypeIDs returns the "type" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// TypeID instead. It exists only for internal usage by the builders.
+func (m *WidgetMutation) TypeIDs() (ids []int) {
+	if id := m._type; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetType resets all changes to the "type" edge.
+func (m *WidgetMutation) ResetType() {
+	m._type = nil
+	m.cleared_type = false
+}
+
 // Where appends a list predicates to the WidgetMutation builder.
 func (m *WidgetMutation) Where(ps ...predicate.Widget) {
 	m.predicates = append(m.predicates, ps...)
@@ -471,49 +512,77 @@ func (m *WidgetMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *WidgetMutation) AddedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m._type != nil {
+		edges = append(edges, widget.EdgeType)
+	}
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
 func (m *WidgetMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case widget.EdgeType:
+		if id := m._type; id != nil {
+			return []ent.Value{*id}
+		}
+	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *WidgetMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *WidgetMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *WidgetMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.cleared_type {
+		edges = append(edges, widget.EdgeType)
+	}
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
 func (m *WidgetMutation) EdgeCleared(name string) bool {
+	switch name {
+	case widget.EdgeType:
+		return m.cleared_type
+	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
 func (m *WidgetMutation) ClearEdge(name string) error {
+	switch name {
+	case widget.EdgeType:
+		m.ClearType()
+		return nil
+	}
 	return fmt.Errorf("unknown Widget unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
 func (m *WidgetMutation) ResetEdge(name string) error {
+	switch name {
+	case widget.EdgeType:
+		m.ResetType()
+		return nil
+	}
 	return fmt.Errorf("unknown Widget edge %s", name)
 }
 

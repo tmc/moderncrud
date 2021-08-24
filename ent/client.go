@@ -14,6 +14,7 @@ import (
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 // Client is the client that holds all ent builders.
@@ -211,6 +212,22 @@ func (c *WidgetClient) GetX(ctx context.Context, id int) *Widget {
 		panic(err)
 	}
 	return obj
+}
+
+// QueryType queries the type edge of a Widget.
+func (c *WidgetClient) QueryType(w *Widget) *WidgetTypeQuery {
+	query := &WidgetTypeQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := w.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(widget.Table, widget.FieldID, id),
+			sqlgraph.To(widgettype.Table, widgettype.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, widget.TypeTable, widget.TypeColumn),
+		)
+		fromV = sqlgraph.Neighbors(w.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
 }
 
 // Hooks returns the client hooks.

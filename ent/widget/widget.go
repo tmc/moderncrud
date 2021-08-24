@@ -20,8 +20,17 @@ const (
 	FieldStatus = "status"
 	// FieldPriority holds the string denoting the priority field in the database.
 	FieldPriority = "priority"
+	// EdgeType holds the string denoting the type edge name in mutations.
+	EdgeType = "type"
 	// Table holds the table name of the widget in the database.
 	Table = "widgets"
+	// TypeTable is the table that holds the type relation/edge.
+	TypeTable = "widgets"
+	// TypeInverseTable is the table name for the WidgetType entity.
+	// It exists in this package in order to avoid circular dependency with the "widgettype" package.
+	TypeInverseTable = "widget_types"
+	// TypeColumn is the table column denoting the type relation/edge.
+	TypeColumn = "widget_type"
 )
 
 // Columns holds all SQL columns for widget fields.
@@ -33,10 +42,21 @@ var Columns = []string{
 	FieldPriority,
 }
 
+// ForeignKeys holds the SQL foreign-keys that are owned by the "widgets"
+// table and are not defined as standalone fields in the schema.
+var ForeignKeys = []string{
+	"widget_type",
+}
+
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
+			return true
+		}
+	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
 			return true
 		}
 	}

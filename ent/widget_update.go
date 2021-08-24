@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/tmc/moderncrud/ent/predicate"
 	"github.com/tmc/moderncrud/ent/widget"
+	"github.com/tmc/moderncrud/ent/widgettype"
 )
 
 // WidgetUpdate is the builder for updating Widget entities.
@@ -67,9 +68,34 @@ func (wu *WidgetUpdate) AddPriority(i int) *WidgetUpdate {
 	return wu
 }
 
+// SetTypeID sets the "type" edge to the WidgetType entity by ID.
+func (wu *WidgetUpdate) SetTypeID(id int) *WidgetUpdate {
+	wu.mutation.SetTypeID(id)
+	return wu
+}
+
+// SetNillableTypeID sets the "type" edge to the WidgetType entity by ID if the given value is not nil.
+func (wu *WidgetUpdate) SetNillableTypeID(id *int) *WidgetUpdate {
+	if id != nil {
+		wu = wu.SetTypeID(*id)
+	}
+	return wu
+}
+
+// SetType sets the "type" edge to the WidgetType entity.
+func (wu *WidgetUpdate) SetType(w *WidgetType) *WidgetUpdate {
+	return wu.SetTypeID(w.ID)
+}
+
 // Mutation returns the WidgetMutation object of the builder.
 func (wu *WidgetUpdate) Mutation() *WidgetMutation {
 	return wu.mutation
+}
+
+// ClearType clears the "type" edge to the WidgetType entity.
+func (wu *WidgetUpdate) ClearType() *WidgetUpdate {
+	wu.mutation.ClearType()
+	return wu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -193,6 +219,41 @@ func (wu *WidgetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: widget.FieldPriority,
 		})
 	}
+	if wu.mutation.TypeCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   widget.TypeTable,
+			Columns: []string{widget.TypeColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: widgettype.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := wu.mutation.TypeIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   widget.TypeTable,
+			Columns: []string{widget.TypeColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: widgettype.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, wu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{widget.Label}
@@ -253,9 +314,34 @@ func (wuo *WidgetUpdateOne) AddPriority(i int) *WidgetUpdateOne {
 	return wuo
 }
 
+// SetTypeID sets the "type" edge to the WidgetType entity by ID.
+func (wuo *WidgetUpdateOne) SetTypeID(id int) *WidgetUpdateOne {
+	wuo.mutation.SetTypeID(id)
+	return wuo
+}
+
+// SetNillableTypeID sets the "type" edge to the WidgetType entity by ID if the given value is not nil.
+func (wuo *WidgetUpdateOne) SetNillableTypeID(id *int) *WidgetUpdateOne {
+	if id != nil {
+		wuo = wuo.SetTypeID(*id)
+	}
+	return wuo
+}
+
+// SetType sets the "type" edge to the WidgetType entity.
+func (wuo *WidgetUpdateOne) SetType(w *WidgetType) *WidgetUpdateOne {
+	return wuo.SetTypeID(w.ID)
+}
+
 // Mutation returns the WidgetMutation object of the builder.
 func (wuo *WidgetUpdateOne) Mutation() *WidgetMutation {
 	return wuo.mutation
+}
+
+// ClearType clears the "type" edge to the WidgetType entity.
+func (wuo *WidgetUpdateOne) ClearType() *WidgetUpdateOne {
+	wuo.mutation.ClearType()
+	return wuo
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
@@ -402,6 +488,41 @@ func (wuo *WidgetUpdateOne) sqlSave(ctx context.Context) (_node *Widget, err err
 			Value:  value,
 			Column: widget.FieldPriority,
 		})
+	}
+	if wuo.mutation.TypeCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   widget.TypeTable,
+			Columns: []string{widget.TypeColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: widgettype.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := wuo.mutation.TypeIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   widget.TypeTable,
+			Columns: []string{widget.TypeColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: widgettype.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Widget{config: wuo.config}
 	_spec.Assign = _node.assignValues

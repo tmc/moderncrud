@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/tmc/moderncrud/ent/widget"
+	"github.com/tmc/moderncrud/ent/widgettype"
 )
 
 // Widget is the model entity for the Widget schema.
@@ -24,6 +25,33 @@ type Widget struct {
 	Status widget.Status `json:"status,omitempty"`
 	// Priority holds the value of the "priority" field.
 	Priority int `json:"priority,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the WidgetQuery when eager-loading is set.
+	Edges       WidgetEdges `json:"edges"`
+	widget_type *int
+}
+
+// WidgetEdges holds the relations/edges for other nodes in the graph.
+type WidgetEdges struct {
+	// Type holds the value of the type edge.
+	Type *WidgetType `json:"type,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// TypeOrErr returns the Type value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e WidgetEdges) TypeOrErr() (*WidgetType, error) {
+	if e.loadedTypes[0] {
+		if e.Type == nil {
+			// The edge type was loaded in eager-loading,
+			// but was not found.
+			return nil, &NotFoundError{label: widgettype.Label}
+		}
+		return e.Type, nil
+	}
+	return nil, &NotLoadedError{edge: "type"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -37,6 +65,8 @@ func (*Widget) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = new(sql.NullString)
 		case widget.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
+		case widget.ForeignKeys[0]: // widget_type
+			values[i] = new(sql.NullInt64)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Widget", columns[i])
 		}
@@ -82,9 +112,21 @@ func (w *Widget) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				w.Priority = int(value.Int64)
 			}
+		case widget.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field widget_type", value)
+			} else if value.Valid {
+				w.widget_type = new(int)
+				*w.widget_type = int(value.Int64)
+			}
 		}
 	}
 	return nil
+}
+
+// QueryType queries the "type" edge of the Widget entity.
+func (w *Widget) QueryType() *WidgetTypeQuery {
+	return (&WidgetClient{config: w.config}).QueryType(w)
 }
 
 // Update returns a builder for updating this Widget.

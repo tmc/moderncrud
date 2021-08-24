@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/tmc/moderncrud/ent/predicate"
 )
 
@@ -421,6 +422,34 @@ func PriorityLT(v int) predicate.Widget {
 func PriorityLTE(v int) predicate.Widget {
 	return predicate.Widget(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldPriority), v))
+	})
+}
+
+// HasType applies the HasEdge predicate on the "type" edge.
+func HasType() predicate.Widget {
+	return predicate.Widget(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(TypeTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, TypeTable, TypeColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasTypeWith applies the HasEdge predicate on the "type" edge with a given conditions (other predicates).
+func HasTypeWith(preds ...predicate.WidgetType) predicate.Widget {
+	return predicate.Widget(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(TypeInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, TypeTable, TypeColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
 	})
 }
 

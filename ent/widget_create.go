@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/tmc/moderncrud/ent/widget"
+	"github.com/tmc/moderncrud/ent/widgettype"
 )
 
 // WidgetCreate is the builder for creating a Widget entity.
@@ -66,6 +67,25 @@ func (wc *WidgetCreate) SetNillablePriority(i *int) *WidgetCreate {
 		wc.SetPriority(*i)
 	}
 	return wc
+}
+
+// SetTypeID sets the "type" edge to the WidgetType entity by ID.
+func (wc *WidgetCreate) SetTypeID(id int) *WidgetCreate {
+	wc.mutation.SetTypeID(id)
+	return wc
+}
+
+// SetNillableTypeID sets the "type" edge to the WidgetType entity by ID if the given value is not nil.
+func (wc *WidgetCreate) SetNillableTypeID(id *int) *WidgetCreate {
+	if id != nil {
+		wc = wc.SetTypeID(*id)
+	}
+	return wc
+}
+
+// SetType sets the "type" edge to the WidgetType entity.
+func (wc *WidgetCreate) SetType(w *WidgetType) *WidgetCreate {
+	return wc.SetTypeID(w.ID)
 }
 
 // Mutation returns the WidgetMutation object of the builder.
@@ -235,6 +255,26 @@ func (wc *WidgetCreate) createSpec() (*Widget, *sqlgraph.CreateSpec) {
 			Column: widget.FieldPriority,
 		})
 		_node.Priority = value
+	}
+	if nodes := wc.mutation.TypeIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   widget.TypeTable,
+			Columns: []string{widget.TypeColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: widgettype.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.widget_type = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/tmc/moderncrud/ent/predicate"
 	"github.com/tmc/moderncrud/ent/widget"
+	"github.com/tmc/moderncrud/ent/widgettype"
 )
 
 // WidgetQuery is the builder for querying Widget entities.
@@ -24,6 +25,9 @@ type WidgetQuery struct {
 	order      []OrderFunc
 	fields     []string
 	predicates []predicate.Widget
+	// eager-loading edges.
+	withType *WidgetTypeQuery
+	withFKs  bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -58,6 +62,28 @@ func (wq *WidgetQuery) Unique(unique bool) *WidgetQuery {
 func (wq *WidgetQuery) Order(o ...OrderFunc) *WidgetQuery {
 	wq.order = append(wq.order, o...)
 	return wq
+}
+
+// QueryType chains the current query on the "type" edge.
+func (wq *WidgetQuery) QueryType() *WidgetTypeQuery {
+	query := &WidgetTypeQuery{config: wq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := wq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := wq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(widget.Table, widget.FieldID, selector),
+			sqlgraph.To(widgettype.Table, widgettype.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, widget.TypeTable, widget.TypeColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(wq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // First returns the first Widget entity from the query.
@@ -241,10 +267,22 @@ func (wq *WidgetQuery) Clone() *WidgetQuery {
 		offset:     wq.offset,
 		order:      append([]OrderFunc{}, wq.order...),
 		predicates: append([]predicate.Widget{}, wq.predicates...),
+		withType:   wq.withType.Clone(),
 		// clone intermediate query.
 		sql:  wq.sql.Clone(),
 		path: wq.path,
 	}
+}
+
+// WithType tells the query-builder to eager-load the nodes that are connected to
+// the "type" edge. The optional arguments are used to configure the query builder of the edge.
+func (wq *WidgetQuery) WithType(opts ...func(*WidgetTypeQuery)) *WidgetQuery {
+	query := &WidgetTypeQuery{config: wq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	wq.withType = query
+	return wq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -310,9 +348,19 @@ func (wq *WidgetQuery) prepareQuery(ctx context.Context) error {
 
 func (wq *WidgetQuery) sqlAll(ctx context.Context) ([]*Widget, error) {
 	var (
-		nodes = []*Widget{}
-		_spec = wq.querySpec()
+		nodes       = []*Widget{}
+		withFKs     = wq.withFKs
+		_spec       = wq.querySpec()
+		loadedTypes = [1]bool{
+			wq.withType != nil,
+		}
 	)
+	if wq.withType != nil {
+		withFKs = true
+	}
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, widget.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]interface{}, error) {
 		node := &Widget{config: wq.config}
 		nodes = append(nodes, node)
@@ -323,6 +371,7 @@ func (wq *WidgetQuery) sqlAll(ctx context.Context) ([]*Widget, error) {
 			return fmt.Errorf("ent: Assign called without calling ScanValues")
 		}
 		node := nodes[len(nodes)-1]
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	if err := sqlgraph.QueryNodes(ctx, wq.driver, _spec); err != nil {
@@ -331,6 +380,36 @@ func (wq *WidgetQuery) sqlAll(ctx context.Context) ([]*Widget, error) {
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+
+	if query := wq.withType; query != nil {
+		ids := make([]int, 0, len(nodes))
+		nodeids := make(map[int][]*Widget)
+		for i := range nodes {
+			if nodes[i].widget_type == nil {
+				continue
+			}
+			fk := *nodes[i].widget_type
+			if _, ok := nodeids[fk]; !ok {
+				ids = append(ids, fk)
+			}
+			nodeids[fk] = append(nodeids[fk], nodes[i])
+		}
+		query.Where(widgettype.IDIn(ids...))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			nodes, ok := nodeids[n.ID]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected foreign-key "widget_type" returned %v`, n.ID)
+			}
+			for i := range nodes {
+				nodes[i].Edges.Type = n
+			}
+		}
+	}
+
 	return nodes, nil
 }
 
