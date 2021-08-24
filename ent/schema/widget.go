@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"entgo.io/ent"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
 
@@ -30,5 +31,8 @@ func (Widget) Fields() []ent.Field {
 
 // Edges of the Widget.
 func (Widget) Edges() []ent.Edge {
-	return nil
+	return []ent.Edge{
+		edge.To("type", WidgetType.Type).
+			Unique(),
+	}
 }
