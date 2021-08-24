@@ -1,0 +1,24 @@
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    name: Check Generated Output
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-go@v2
+      with:
+        go-version: '^1.16'
+    - run: make deps
+    - run: make generate
+    - run: |
+        if $(git diff --quiet --exit-code); then
+          echo 'No changes detected.'
+        else
+          echo 'Detected changed files: please regenerate'
+          git diff --stat
+          exit 1
+        fi
