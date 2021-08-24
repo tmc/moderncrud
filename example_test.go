@@ -22,11 +22,20 @@ func Example_Widget() {
 	if err := client.Schema.Create(ctx); err != nil {
 		log.Fatalf("failed creating schema resources: %v", err)
 	}
-	widget1, err := client.Widget.Create().Save(ctx)
+	wt, err := client.WidgetType.Create().
+		SetName("shiny").
+		Save(ctx)
+	if err != nil {
+		log.Fatalf("failed creating a widgettype: %v", err)
+	}
+	widget1, err := client.Widget.Create().
+		SetType(wt).
+		SetNote("this is an example widget").
+		Save(ctx)
 	if err != nil {
 		log.Fatalf("failed creating a widget: %v", err)
 	}
-	fmt.Println(widget1)
+	fmt.Println(widget1.ID)
 	// Output:
-	// Widget(id=1)
+	// 1
 }
