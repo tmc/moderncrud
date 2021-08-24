@@ -22,7 +22,15 @@ func main() {
 	}
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, "hello, world")
+		fmt.Fprintln(w, "hello, world")
+		widgets, err := client.Widget.Query().All(r.Context())
+		if err != nil {
+			fmt.Fprintln(w, err)
+			return
+		}
+		for _, widget := range widgets {
+			fmt.Fprintln(w, widget)
+		}
 	})
 
 	port := os.Getenv("PORT")
