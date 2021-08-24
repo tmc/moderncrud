@@ -9,6 +9,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/tmc/moderncrud/ent/widget"
+	"github.com/tmc/moderncrud/ent/widgettype"
 )
 
 // ent aliases to avoid import conflicts in user's code.
@@ -29,7 +30,8 @@ type OrderFunc func(*sql.Selector)
 // columnChecker returns a function indicates if the column exists in the given column.
 func columnChecker(table string) func(string) error {
 	checks := map[string]func(string) bool{
-		widget.Table: widget.ValidColumn,
+		widget.Table:     widget.ValidColumn,
+		widgettype.Table: widgettype.ValidColumn,
 	}
 	check, ok := checks[table]
 	if !ok {

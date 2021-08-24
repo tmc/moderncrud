@@ -14,6 +14,8 @@ type Tx struct {
 	config
 	// Widget is the client for interacting with the Widget builders.
 	Widget *WidgetClient
+	// WidgetType is the client for interacting with the WidgetType builders.
+	WidgetType *WidgetTypeClient
 
 	// lazily loaded.
 	client     *Client
@@ -150,6 +152,7 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.Widget = NewWidgetClient(tx.config)
+	tx.WidgetType = NewWidgetTypeClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

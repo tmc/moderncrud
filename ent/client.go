@@ -10,6 +10,7 @@ import (
 	"github.com/tmc/moderncrud/ent/migrate"
 
 	"github.com/tmc/moderncrud/ent/widget"
+	"github.com/tmc/moderncrud/ent/widgettype"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
@@ -22,6 +23,8 @@ type Client struct {
 	Schema *migrate.Schema
 	// Widget is the client for interacting with the Widget builders.
 	Widget *WidgetClient
+	// WidgetType is the client for interacting with the WidgetType builders.
+	WidgetType *WidgetTypeClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -36,6 +39,7 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.Widget = NewWidgetClient(c.config)
+	c.WidgetType = NewWidgetTypeClient(c.config)
 }
 
 // Open opens a database/sql.DB specified by the driver name and
@@ -67,9 +71,10 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:    ctx,
-		config: cfg,
-		Widget: NewWidgetClient(cfg),
+		ctx:        ctx,
+		config:     cfg,
+		Widget:     NewWidgetClient(cfg),
+		WidgetType: NewWidgetTypeClient(cfg),
 	}, nil
 }
 
@@ -87,8 +92,9 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		config: cfg,
-		Widget: NewWidgetClient(cfg),
+		config:     cfg,
+		Widget:     NewWidgetClient(cfg),
+		WidgetType: NewWidgetTypeClient(cfg),
 	}, nil
 }
 
@@ -119,6 +125,7 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	c.Widget.Use(hooks...)
+	c.WidgetType.Use(hooks...)
 }
 
 // WidgetClient is a client for the Widget schema.
@@ -209,4 +216,94 @@ func (c *WidgetClient) GetX(ctx context.Context, id int) *Widget {
 // Hooks returns the client hooks.
 func (c *WidgetClient) Hooks() []Hook {
 	return c.hooks.Widget
+}
+
+// WidgetTypeClient is a client for the WidgetType schema.
+type WidgetTypeClient struct {
+	config
+}
+
+// NewWidgetTypeClient returns a client for the WidgetType from the given config.
+func NewWidgetTypeClient(c config) *WidgetTypeClient {
+	return &WidgetTypeClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `widgettype.Hooks(f(g(h())))`.
+func (c *WidgetTypeClient) Use(hooks ...Hook) {
+	c.hooks.WidgetType = append(c.hooks.WidgetType, hooks...)
+}
+
+// Create returns a create builder for WidgetType.
+func (c *WidgetTypeClient) Create() *WidgetTypeCreate {
+	mutation := newWidgetTypeMutation(c.config, OpCreate)
+	return &WidgetTypeCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of WidgetType entities.
+func (c *WidgetTypeClient) CreateBulk(builders ...*WidgetTypeCreate) *WidgetTypeCreateBulk {
+	return &WidgetTypeCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for WidgetType.
+func (c *WidgetTypeClient) Update() *WidgetTypeUpdate {
+	mutation := newWidgetTypeMutation(c.config, OpUpdate)
+	return &WidgetTypeUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *WidgetTypeClient) UpdateOne(wt *WidgetType) *WidgetTypeUpdateOne {
+	mutation := newWidgetTypeMutation(c.config, OpUpdateOne, withWidgetType(wt))
+	return &WidgetTypeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *WidgetTypeClient) UpdateOneID(id int) *WidgetTypeUpdateOne {
+	mutation := newWidgetTypeMutation(c.config, OpUpdateOne, withWidgetTypeID(id))
+	return &WidgetTypeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for WidgetType.
+func (c *WidgetTypeClient) Delete() *WidgetTypeDelete {
+	mutation := newWidgetTypeMutation(c.config, OpDelete)
+	return &WidgetTypeDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *WidgetTypeClient) DeleteOne(wt *WidgetType) *WidgetTypeDeleteOne {
+	return c.DeleteOneID(wt.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *WidgetTypeClient) DeleteOneID(id int) *WidgetTypeDeleteOne {
+	builder := c.Delete().Where(widgettype.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &WidgetTypeDeleteOne{builder}
+}
+
+// Query returns a query builder for WidgetType.
+func (c *WidgetTypeClient) Query() *WidgetTypeQuery {
+	return &WidgetTypeQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a WidgetType entity by its id.
+func (c *WidgetTypeClient) Get(ctx context.Context, id int) (*WidgetType, error) {
+	return c.Query().Where(widgettype.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *WidgetTypeClient) GetX(ctx context.Context, id int) *WidgetType {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *WidgetTypeClient) Hooks() []Hook {
+	return c.hooks.WidgetType
 }

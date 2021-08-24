@@ -8,3 +8,6 @@ import (
 
 // Widget is the predicate function for widget builders.
 type Widget func(*sql.Selector)
+
+// WidgetType is the predicate function for widgettype builders.
+type WidgetType func(*sql.Selector)

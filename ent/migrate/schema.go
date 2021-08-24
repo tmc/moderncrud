@@ -18,9 +18,20 @@ var (
 		Columns:    WidgetsColumns,
 		PrimaryKey: []*schema.Column{WidgetsColumns[0]},
 	}
+	// WidgetTypesColumns holds the columns for the "widget_types" table.
+	WidgetTypesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+	}
+	// WidgetTypesTable holds the schema information for the "widget_types" table.
+	WidgetTypesTable = &schema.Table{
+		Name:       "widget_types",
+		Columns:    WidgetTypesColumns,
+		PrimaryKey: []*schema.Column{WidgetTypesColumns[0]},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		WidgetsTable,
+		WidgetTypesTable,
 	}
 )
 
