@@ -1,6 +1,9 @@
 package schema
 
-import "entgo.io/ent"
+import (
+	"entgo.io/ent"
+	"entgo.io/ent/schema/field"
+)
 
 // WidgetType holds the schema definition for the WidgetType entity.
 type WidgetType struct {
@@ -9,7 +12,9 @@ type WidgetType struct {
 
 // Fields of the WidgetType.
 func (WidgetType) Fields() []ent.Field {
-	return nil
+	return []ent.Field{
+		field.Text("name"),
+	}
 }
 
 // Edges of the WidgetType.
