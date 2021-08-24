@@ -34,6 +34,7 @@ var (
 	// WidgetTypesColumns holds the columns for the "widget_types" table.
 	WidgetTypesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "name", Type: field.TypeString, Size: 2147483647},
 	}
 	// WidgetTypesTable holds the schema information for the "widget_types" table.
 	WidgetTypesTable = &schema.Table{

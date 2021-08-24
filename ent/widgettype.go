@@ -12,9 +12,11 @@ import (
 
 // WidgetType is the model entity for the WidgetType schema.
 type WidgetType struct {
-	config
+	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
+	// Name holds the value of the "name" field.
+	Name string `json:"name,omitempty"`
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -24,6 +26,8 @@ func (*WidgetType) scanValues(columns []string) ([]interface{}, error) {
 		switch columns[i] {
 		case widgettype.FieldID:
 			values[i] = new(sql.NullInt64)
+		case widgettype.FieldName:
+			values[i] = new(sql.NullString)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type WidgetType", columns[i])
 		}
@@ -45,6 +49,12 @@ func (wt *WidgetType) assignValues(columns []string, values []interface{}) error
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			wt.ID = int(value.Int64)
+		case widgettype.FieldName:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field name", values[i])
+			} else if value.Valid {
+				wt.Name = value.String
+			}
 		}
 	}
 	return nil
@@ -73,6 +83,8 @@ func (wt *WidgetType) String() string {
 	var builder strings.Builder
 	builder.WriteString("WidgetType(")
 	builder.WriteString(fmt.Sprintf("id=%v", wt.ID))
+	builder.WriteString(", name=")
+	builder.WriteString(wt.Name)
 	builder.WriteByte(')')
 	return builder.String()
 }

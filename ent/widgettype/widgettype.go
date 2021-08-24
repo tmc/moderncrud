@@ -7,6 +7,8 @@ const (
 	Label = "widget_type"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldName holds the string denoting the name field in the database.
+	FieldName = "name"
 	// Table holds the table name of the widgettype in the database.
 	Table = "widget_types"
 )
@@ -14,6 +16,7 @@ const (
 // Columns holds all SQL columns for widgettype fields.
 var Columns = []string{
 	FieldID,
+	FieldName,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).

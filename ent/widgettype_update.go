@@ -26,6 +26,12 @@ func (wtu *WidgetTypeUpdate) Where(ps ...predicate.WidgetType) *WidgetTypeUpdate
 	return wtu
 }
 
+// SetName sets the "name" field.
+func (wtu *WidgetTypeUpdate) SetName(s string) *WidgetTypeUpdate {
+	wtu.mutation.SetName(s)
+	return wtu
+}
+
 // Mutation returns the WidgetTypeMutation object of the builder.
 func (wtu *WidgetTypeUpdate) Mutation() *WidgetTypeMutation {
 	return wtu.mutation
@@ -103,6 +109,13 @@ func (wtu *WidgetTypeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
+	if value, ok := wtu.mutation.Name(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: widgettype.FieldName,
+		})
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, wtu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{widgettype.Label}
@@ -120,6 +133,12 @@ type WidgetTypeUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *WidgetTypeMutation
+}
+
+// SetName sets the "name" field.
+func (wtuo *WidgetTypeUpdateOne) SetName(s string) *WidgetTypeUpdateOne {
+	wtuo.mutation.SetName(s)
+	return wtuo
 }
 
 // Mutation returns the WidgetTypeMutation object of the builder.
@@ -222,6 +241,13 @@ func (wtuo *WidgetTypeUpdateOne) sqlSave(ctx context.Context) (_node *WidgetType
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := wtuo.mutation.Name(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: widgettype.FieldName,
+		})
 	}
 	_node = &WidgetType{config: wtuo.config}
 	_spec.Assign = _node.assignValues

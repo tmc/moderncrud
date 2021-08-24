@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -16,6 +17,12 @@ type WidgetTypeCreate struct {
 	config
 	mutation *WidgetTypeMutation
 	hooks    []Hook
+}
+
+// SetName sets the "name" field.
+func (wtc *WidgetTypeCreate) SetName(s string) *WidgetTypeCreate {
+	wtc.mutation.SetName(s)
+	return wtc
 }
 
 // Mutation returns the WidgetTypeMutation object of the builder.
@@ -88,6 +95,9 @@ func (wtc *WidgetTypeCreate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (wtc *WidgetTypeCreate) check() error {
+	if _, ok := wtc.mutation.Name(); !ok {
+		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "name"`)}
+	}
 	return nil
 }
 
@@ -115,6 +125,14 @@ func (wtc *WidgetTypeCreate) createSpec() (*WidgetType, *sqlgraph.CreateSpec) {
 			},
 		}
 	)
+	if value, ok := wtc.mutation.Name(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: widgettype.FieldName,
+		})
+		_node.Name = value
+	}
 	return _node, _spec
 }
 
