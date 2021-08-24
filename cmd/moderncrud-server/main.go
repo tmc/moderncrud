@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -33,8 +34,14 @@ func main() {
 		}
 	})
 	http.HandleFunc("/widgets", func(w http.ResponseWriter, r *http.Request) {
+		widget := ent.Widget{}
 		if r.Method == http.MethodPost {
-			err := client.Widget.Create().Exec(r.Context())
+			json.NewDecoder(r.Body).Decode(&widget)
+			defer r.Body.Close()
+			err := client.Widget.
+				Create().
+				SetNote(widget.Note).
+				Exec(r.Context())
 			if err != nil {
 				fmt.Fprintln(w, err)
 			} else {
