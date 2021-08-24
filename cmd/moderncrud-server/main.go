@@ -73,8 +73,7 @@ func newConnection() *ent.Client {
 		socketDir = "/cloudsql"
 	}
 
-	var dbURI string
-	dbURI = fmt.Sprintf("user=%s password=%s database=%s host=%s/%s", dbUser, dbPwd, dbName, socketDir, instanceConnectionName)
+	dbURI := fmt.Sprintf("user=%s password=%s database=%s host=%s/%s", dbUser, dbPwd, dbName, socketDir, instanceConnectionName)
 
 	db, err := sql.Open("pgx", dbURI)
 	if err != nil {
