@@ -1,4 +1,4 @@
-package moderncrud
+package main
 
 import (
 	"fmt"
