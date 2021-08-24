@@ -249,6 +249,19 @@ func (wq *WidgetQuery) Clone() *WidgetQuery {
 
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
+//
+// Example:
+//
+//	var v []struct {
+//		Note string `json:"note,omitempty"`
+//		Count int `json:"count,omitempty"`
+//	}
+//
+//	client.Widget.Query().
+//		GroupBy(widget.FieldNote).
+//		Aggregate(ent.Count()).
+//		Scan(ctx, &v)
+//
 func (wq *WidgetQuery) GroupBy(field string, fields ...string) *WidgetGroupBy {
 	group := &WidgetGroupBy{config: wq.config}
 	group.fields = append([]string{field}, fields...)
@@ -263,6 +276,17 @@ func (wq *WidgetQuery) GroupBy(field string, fields ...string) *WidgetGroupBy {
 
 // Select allows the selection one or more fields/columns for the given query,
 // instead of selecting all fields in the entity.
+//
+// Example:
+//
+//	var v []struct {
+//		Note string `json:"note,omitempty"`
+//	}
+//
+//	client.Widget.Query().
+//		Select(widget.FieldNote).
+//		Scan(ctx, &v)
+//
 func (wq *WidgetQuery) Select(fields ...string) *WidgetSelect {
 	wq.fields = append(wq.fields, fields...)
 	return &WidgetSelect{WidgetQuery: wq}

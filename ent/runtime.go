@@ -2,8 +2,29 @@
 
 package ent
 
+import (
+	"time"
+
+	"github.com/tmc/moderncrud/ent/schema"
+	"github.com/tmc/moderncrud/ent/widget"
+)
+
 // The init function reads all schema descriptors with runtime code
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	widgetFields := schema.Widget{}.Fields()
+	_ = widgetFields
+	// widgetDescNote is the schema descriptor for note field.
+	widgetDescNote := widgetFields[0].Descriptor()
+	// widget.NoteValidator is a validator for the "note" field. It is called by the builders before save.
+	widget.NoteValidator = widgetDescNote.Validators[0].(func(string) error)
+	// widgetDescCreatedAt is the schema descriptor for created_at field.
+	widgetDescCreatedAt := widgetFields[1].Descriptor()
+	// widget.DefaultCreatedAt holds the default value on creation for the created_at field.
+	widget.DefaultCreatedAt = widgetDescCreatedAt.Default.(func() time.Time)
+	// widgetDescPriority is the schema descriptor for priority field.
+	widgetDescPriority := widgetFields[3].Descriptor()
+	// widget.DefaultPriority holds the default value on creation for the priority field.
+	widget.DefaultPriority = widgetDescPriority.Default.(int)
 }

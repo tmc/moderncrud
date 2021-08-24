@@ -6,9 +6,12 @@ import (
 	"context"
 	"fmt"
 	"sync"
+	"time"
+
+	"github.com/tmc/moderncrud/ent/predicate"
+	"github.com/tmc/moderncrud/ent/widget"
 
 	"entgo.io/ent"
-	"github.com/tmc/moderncrud/ent/predicate"
 )
 
 const (
@@ -30,6 +33,11 @@ type WidgetMutation struct {
 	op            Op
 	typ           string
 	id            *int
+	note          *string
+	created_at    *time.Time
+	status        *widget.Status
+	priority      *int
+	addpriority   *int
 	clearedFields map[string]struct{}
 	done          bool
 	oldValue      func(context.Context) (*Widget, error)
@@ -115,6 +123,170 @@ func (m *WidgetMutation) ID() (id int, exists bool) {
 	return *m.id, true
 }
 
+// SetNote sets the "note" field.
+func (m *WidgetMutation) SetNote(s string) {
+	m.note = &s
+}
+
+// Note returns the value of the "note" field in the mutation.
+func (m *WidgetMutation) Note() (r string, exists bool) {
+	v := m.note
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldNote returns the old "note" field's value of the Widget entity.
+// If the Widget object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *WidgetMutation) OldNote(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldNote is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldNote requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldNote: %w", err)
+	}
+	return oldValue.Note, nil
+}
+
+// ResetNote resets all changes to the "note" field.
+func (m *WidgetMutation) ResetNote() {
+	m.note = nil
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *WidgetMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *WidgetMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the Widget entity.
+// If the Widget object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *WidgetMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *WidgetMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetStatus sets the "status" field.
+func (m *WidgetMutation) SetStatus(w widget.Status) {
+	m.status = &w
+}
+
+// Status returns the value of the "status" field in the mutation.
+func (m *WidgetMutation) Status() (r widget.Status, exists bool) {
+	v := m.status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStatus returns the old "status" field's value of the Widget entity.
+// If the Widget object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *WidgetMutation) OldStatus(ctx context.Context) (v widget.Status, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
+	}
+	return oldValue.Status, nil
+}
+
+// ResetStatus resets all changes to the "status" field.
+func (m *WidgetMutation) ResetStatus() {
+	m.status = nil
+}
+
+// SetPriority sets the "priority" field.
+func (m *WidgetMutation) SetPriority(i int) {
+	m.priority = &i
+	m.addpriority = nil
+}
+
+// Priority returns the value of the "priority" field in the mutation.
+func (m *WidgetMutation) Priority() (r int, exists bool) {
+	v := m.priority
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPriority returns the old "priority" field's value of the Widget entity.
+// If the Widget object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *WidgetMutation) OldPriority(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldPriority is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldPriority requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPriority: %w", err)
+	}
+	return oldValue.Priority, nil
+}
+
+// AddPriority adds i to the "priority" field.
+func (m *WidgetMutation) AddPriority(i int) {
+	if m.addpriority != nil {
+		*m.addpriority += i
+	} else {
+		m.addpriority = &i
+	}
+}
+
+// AddedPriority returns the value that was added to the "priority" field in this mutation.
+func (m *WidgetMutation) AddedPriority() (r int, exists bool) {
+	v := m.addpriority
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetPriority resets all changes to the "priority" field.
+func (m *WidgetMutation) ResetPriority() {
+	m.priority = nil
+	m.addpriority = nil
+}
+
 // Where appends a list predicates to the WidgetMutation builder.
 func (m *WidgetMutation) Where(ps ...predicate.Widget) {
 	m.predicates = append(m.predicates, ps...)
@@ -134,7 +306,19 @@ func (m *WidgetMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *WidgetMutation) Fields() []string {
-	fields := make([]string, 0, 0)
+	fields := make([]string, 0, 4)
+	if m.note != nil {
+		fields = append(fields, widget.FieldNote)
+	}
+	if m.created_at != nil {
+		fields = append(fields, widget.FieldCreatedAt)
+	}
+	if m.status != nil {
+		fields = append(fields, widget.FieldStatus)
+	}
+	if m.priority != nil {
+		fields = append(fields, widget.FieldPriority)
+	}
 	return fields
 }
 
@@ -142,6 +326,16 @@ func (m *WidgetMutation) Fields() []string {
 // return value indicates that this field was not set, or was not defined in the
 // schema.
 func (m *WidgetMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case widget.FieldNote:
+		return m.Note()
+	case widget.FieldCreatedAt:
+		return m.CreatedAt()
+	case widget.FieldStatus:
+		return m.Status()
+	case widget.FieldPriority:
+		return m.Priority()
+	}
 	return nil, false
 }
 
@@ -149,6 +343,16 @@ func (m *WidgetMutation) Field(name string) (ent.Value, bool) {
 // returned if the mutation operation is not UpdateOne, or the query to the
 // database failed.
 func (m *WidgetMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case widget.FieldNote:
+		return m.OldNote(ctx)
+	case widget.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case widget.FieldStatus:
+		return m.OldStatus(ctx)
+	case widget.FieldPriority:
+		return m.OldPriority(ctx)
+	}
 	return nil, fmt.Errorf("unknown Widget field %s", name)
 }
 
@@ -157,6 +361,34 @@ func (m *WidgetMutation) OldField(ctx context.Context, name string) (ent.Value, 
 // type.
 func (m *WidgetMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case widget.FieldNote:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetNote(v)
+		return nil
+	case widget.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case widget.FieldStatus:
+		v, ok := value.(widget.Status)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStatus(v)
+		return nil
+	case widget.FieldPriority:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPriority(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Widget field %s", name)
 }
@@ -164,13 +396,21 @@ func (m *WidgetMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *WidgetMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	if m.addpriority != nil {
+		fields = append(fields, widget.FieldPriority)
+	}
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *WidgetMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case widget.FieldPriority:
+		return m.AddedPriority()
+	}
 	return nil, false
 }
 
@@ -178,6 +418,15 @@ func (m *WidgetMutation) AddedField(name string) (ent.Value, bool) {
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
 func (m *WidgetMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case widget.FieldPriority:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddPriority(v)
+		return nil
+	}
 	return fmt.Errorf("unknown Widget numeric field %s", name)
 }
 
@@ -203,6 +452,20 @@ func (m *WidgetMutation) ClearField(name string) error {
 // ResetField resets all changes in the mutation for the field with the given name.
 // It returns an error if the field is not defined in the schema.
 func (m *WidgetMutation) ResetField(name string) error {
+	switch name {
+	case widget.FieldNote:
+		m.ResetNote()
+		return nil
+	case widget.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case widget.FieldStatus:
+		m.ResetStatus()
+		return nil
+	case widget.FieldPriority:
+		m.ResetPriority()
+		return nil
+	}
 	return fmt.Errorf("unknown Widget field %s", name)
 }
 
