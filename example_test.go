@@ -2,6 +2,7 @@ package moderncrud
 
 import (
 	"context"
+	"fmt"
 	"log"
 
 	"entgo.io/ent/dialect"
@@ -9,7 +10,7 @@ import (
 	"github.com/tmc/moderncrud/ent"
 )
 
-func Example_Todo() {
+func Example_Widget() {
 	// Create an ent.Client with in-memory SQLite database.
 	client, err := ent.Open(dialect.SQLite, "file:ent?mode=memory&cache=shared&_fk=1")
 	if err != nil {
@@ -21,5 +22,11 @@ func Example_Todo() {
 	if err := client.Schema.Create(ctx); err != nil {
 		log.Fatalf("failed creating schema resources: %v", err)
 	}
+	widget1, err := client.Widget.Create().Save(ctx)
+	if err != nil {
+		log.Fatalf("failed creating a widget: %v", err)
+	}
+	fmt.Println(widget1)
 	// Output:
+	// Widget(id=1)
 }
