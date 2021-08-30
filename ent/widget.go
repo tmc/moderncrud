@@ -25,6 +25,8 @@ type Widget struct {
 	Status widget.Status `json:"status,omitempty"`
 	// Priority holds the value of the "priority" field.
 	Priority int `json:"priority,omitempty"`
+	// TestField holds the value of the "test_field" field.
+	TestField string `json:"test_field,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the WidgetQuery when eager-loading is set.
 	Edges       WidgetEdges `json:"edges"`
@@ -61,7 +63,7 @@ func (*Widget) scanValues(columns []string) ([]interface{}, error) {
 		switch columns[i] {
 		case widget.FieldID, widget.FieldPriority:
 			values[i] = new(sql.NullInt64)
-		case widget.FieldNote, widget.FieldStatus:
+		case widget.FieldNote, widget.FieldStatus, widget.FieldTestField:
 			values[i] = new(sql.NullString)
 		case widget.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
@@ -112,6 +114,12 @@ func (w *Widget) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				w.Priority = int(value.Int64)
 			}
+		case widget.FieldTestField:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field test_field", values[i])
+			} else if value.Valid {
+				w.TestField = value.String
+			}
 		case widget.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field widget_type", value)
@@ -160,6 +168,8 @@ func (w *Widget) String() string {
 	builder.WriteString(fmt.Sprintf("%v", w.Status))
 	builder.WriteString(", priority=")
 	builder.WriteString(fmt.Sprintf("%v", w.Priority))
+	builder.WriteString(", test_field=")
+	builder.WriteString(w.TestField)
 	builder.WriteByte(')')
 	return builder.String()
 }

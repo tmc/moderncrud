@@ -69,6 +69,12 @@ func (wc *WidgetCreate) SetNillablePriority(i *int) *WidgetCreate {
 	return wc
 }
 
+// SetTestField sets the "test_field" field.
+func (wc *WidgetCreate) SetTestField(s string) *WidgetCreate {
+	wc.mutation.SetTestField(s)
+	return wc
+}
+
 // SetTypeID sets the "type" edge to the WidgetType entity by ID.
 func (wc *WidgetCreate) SetTypeID(id int) *WidgetCreate {
 	wc.mutation.SetTypeID(id)
@@ -197,6 +203,9 @@ func (wc *WidgetCreate) check() error {
 	if _, ok := wc.mutation.Priority(); !ok {
 		return &ValidationError{Name: "priority", err: errors.New(`ent: missing required field "priority"`)}
 	}
+	if _, ok := wc.mutation.TestField(); !ok {
+		return &ValidationError{Name: "test_field", err: errors.New(`ent: missing required field "test_field"`)}
+	}
 	return nil
 }
 
@@ -255,6 +264,14 @@ func (wc *WidgetCreate) createSpec() (*Widget, *sqlgraph.CreateSpec) {
 			Column: widget.FieldPriority,
 		})
 		_node.Priority = value
+	}
+	if value, ok := wc.mutation.TestField(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: widget.FieldTestField,
+		})
+		_node.TestField = value
 	}
 	if nodes := wc.mutation.TypeIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

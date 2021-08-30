@@ -15,6 +15,7 @@ var (
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"draft", "completed"}, Default: "draft"},
 		{Name: "priority", Type: field.TypeInt, Default: 0},
+		{Name: "test_field", Type: field.TypeString, Size: 2147483647},
 		{Name: "widget_type", Type: field.TypeInt, Nullable: true},
 	}
 	// WidgetsTable holds the schema information for the "widgets" table.
@@ -25,7 +26,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "widgets_widget_types_type",
-				Columns:    []*schema.Column{WidgetsColumns[5]},
+				Columns:    []*schema.Column{WidgetsColumns[6]},
 				RefColumns: []*schema.Column{WidgetTypesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},

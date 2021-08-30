@@ -114,6 +114,13 @@ func Priority(v int) predicate.Widget {
 	})
 }
 
+// TestField applies equality check predicate on the "test_field" field. It's identical to TestFieldEQ.
+func TestField(v string) predicate.Widget {
+	return predicate.Widget(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldTestField), v))
+	})
+}
+
 // NoteEQ applies the EQ predicate on the "note" field.
 func NoteEQ(v string) predicate.Widget {
 	return predicate.Widget(func(s *sql.Selector) {
@@ -422,6 +429,117 @@ func PriorityLT(v int) predicate.Widget {
 func PriorityLTE(v int) predicate.Widget {
 	return predicate.Widget(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldPriority), v))
+	})
+}
+
+// TestFieldEQ applies the EQ predicate on the "test_field" field.
+func TestFieldEQ(v string) predicate.Widget {
+	return predicate.Widget(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldTestField), v))
+	})
+}
+
+// TestFieldNEQ applies the NEQ predicate on the "test_field" field.
+func TestFieldNEQ(v string) predicate.Widget {
+	return predicate.Widget(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldTestField), v))
+	})
+}
+
+// TestFieldIn applies the In predicate on the "test_field" field.
+func TestFieldIn(vs ...string) predicate.Widget {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Widget(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldTestField), v...))
+	})
+}
+
+// TestFieldNotIn applies the NotIn predicate on the "test_field" field.
+func TestFieldNotIn(vs ...string) predicate.Widget {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Widget(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldTestField), v...))
+	})
+}
+
+// TestFieldGT applies the GT predicate on the "test_field" field.
+func TestFieldGT(v string) predicate.Widget {
+	return predicate.Widget(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldTestField), v))
+	})
+}
+
+// TestFieldGTE applies the GTE predicate on the "test_field" field.
+func TestFieldGTE(v string) predicate.Widget {
+	return predicate.Widget(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldTestField), v))
+	})
+}
+
+// TestFieldLT applies the LT predicate on the "test_field" field.
+func TestFieldLT(v string) predicate.Widget {
+	return predicate.Widget(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldTestField), v))
+	})
+}
+
+// TestFieldLTE applies the LTE predicate on the "test_field" field.
+func TestFieldLTE(v string) predicate.Widget {
+	return predicate.Widget(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldTestField), v))
+	})
+}
+
+// TestFieldContains applies the Contains predicate on the "test_field" field.
+func TestFieldContains(v string) predicate.Widget {
+	return predicate.Widget(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldTestField), v))
+	})
+}
+
+// TestFieldHasPrefix applies the HasPrefix predicate on the "test_field" field.
+func TestFieldHasPrefix(v string) predicate.Widget {
+	return predicate.Widget(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldTestField), v))
+	})
+}
+
+// TestFieldHasSuffix applies the HasSuffix predicate on the "test_field" field.
+func TestFieldHasSuffix(v string) predicate.Widget {
+	return predicate.Widget(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldTestField), v))
+	})
+}
+
+// TestFieldEqualFold applies the EqualFold predicate on the "test_field" field.
+func TestFieldEqualFold(v string) predicate.Widget {
+	return predicate.Widget(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldTestField), v))
+	})
+}
+
+// TestFieldContainsFold applies the ContainsFold predicate on the "test_field" field.
+func TestFieldContainsFold(v string) predicate.Widget {
+	return predicate.Widget(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldTestField), v))
 	})
 }
 

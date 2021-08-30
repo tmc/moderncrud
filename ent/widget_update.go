@@ -68,6 +68,12 @@ func (wu *WidgetUpdate) AddPriority(i int) *WidgetUpdate {
 	return wu
 }
 
+// SetTestField sets the "test_field" field.
+func (wu *WidgetUpdate) SetTestField(s string) *WidgetUpdate {
+	wu.mutation.SetTestField(s)
+	return wu
+}
+
 // SetTypeID sets the "type" edge to the WidgetType entity by ID.
 func (wu *WidgetUpdate) SetTypeID(id int) *WidgetUpdate {
 	wu.mutation.SetTypeID(id)
@@ -219,6 +225,13 @@ func (wu *WidgetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: widget.FieldPriority,
 		})
 	}
+	if value, ok := wu.mutation.TestField(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: widget.FieldTestField,
+		})
+	}
 	if wu.mutation.TypeCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -311,6 +324,12 @@ func (wuo *WidgetUpdateOne) SetNillablePriority(i *int) *WidgetUpdateOne {
 // AddPriority adds i to the "priority" field.
 func (wuo *WidgetUpdateOne) AddPriority(i int) *WidgetUpdateOne {
 	wuo.mutation.AddPriority(i)
+	return wuo
+}
+
+// SetTestField sets the "test_field" field.
+func (wuo *WidgetUpdateOne) SetTestField(s string) *WidgetUpdateOne {
+	wuo.mutation.SetTestField(s)
 	return wuo
 }
 
@@ -487,6 +506,13 @@ func (wuo *WidgetUpdateOne) sqlSave(ctx context.Context) (_node *Widget, err err
 			Type:   field.TypeInt,
 			Value:  value,
 			Column: widget.FieldPriority,
+		})
+	}
+	if value, ok := wuo.mutation.TestField(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: widget.FieldTestField,
 		})
 	}
 	if wuo.mutation.TypeCleared() {

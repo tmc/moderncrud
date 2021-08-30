@@ -20,6 +20,8 @@ const (
 	FieldStatus = "status"
 	// FieldPriority holds the string denoting the priority field in the database.
 	FieldPriority = "priority"
+	// FieldTestField holds the string denoting the test_field field in the database.
+	FieldTestField = "test_field"
 	// EdgeType holds the string denoting the type edge name in mutations.
 	EdgeType = "type"
 	// Table holds the table name of the widget in the database.
@@ -40,6 +42,7 @@ var Columns = []string{
 	FieldCreatedAt,
 	FieldStatus,
 	FieldPriority,
+	FieldTestField,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "widgets"

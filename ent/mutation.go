@@ -39,6 +39,7 @@ type WidgetMutation struct {
 	status        *widget.Status
 	priority      *int
 	addpriority   *int
+	test_field    *string
 	clearedFields map[string]struct{}
 	_type         *int
 	cleared_type  bool
@@ -290,6 +291,42 @@ func (m *WidgetMutation) ResetPriority() {
 	m.addpriority = nil
 }
 
+// SetTestField sets the "test_field" field.
+func (m *WidgetMutation) SetTestField(s string) {
+	m.test_field = &s
+}
+
+// TestField returns the value of the "test_field" field in the mutation.
+func (m *WidgetMutation) TestField() (r string, exists bool) {
+	v := m.test_field
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTestField returns the old "test_field" field's value of the Widget entity.
+// If the Widget object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *WidgetMutation) OldTestField(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldTestField is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldTestField requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTestField: %w", err)
+	}
+	return oldValue.TestField, nil
+}
+
+// ResetTestField resets all changes to the "test_field" field.
+func (m *WidgetMutation) ResetTestField() {
+	m.test_field = nil
+}
+
 // SetTypeID sets the "type" edge to the WidgetType entity by id.
 func (m *WidgetMutation) SetTypeID(id int) {
 	m._type = &id
@@ -348,7 +385,7 @@ func (m *WidgetMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *WidgetMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 5)
 	if m.note != nil {
 		fields = append(fields, widget.FieldNote)
 	}
@@ -360,6 +397,9 @@ func (m *WidgetMutation) Fields() []string {
 	}
 	if m.priority != nil {
 		fields = append(fields, widget.FieldPriority)
+	}
+	if m.test_field != nil {
+		fields = append(fields, widget.FieldTestField)
 	}
 	return fields
 }
@@ -377,6 +417,8 @@ func (m *WidgetMutation) Field(name string) (ent.Value, bool) {
 		return m.Status()
 	case widget.FieldPriority:
 		return m.Priority()
+	case widget.FieldTestField:
+		return m.TestField()
 	}
 	return nil, false
 }
@@ -394,6 +436,8 @@ func (m *WidgetMutation) OldField(ctx context.Context, name string) (ent.Value, 
 		return m.OldStatus(ctx)
 	case widget.FieldPriority:
 		return m.OldPriority(ctx)
+	case widget.FieldTestField:
+		return m.OldTestField(ctx)
 	}
 	return nil, fmt.Errorf("unknown Widget field %s", name)
 }
@@ -430,6 +474,13 @@ func (m *WidgetMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetPriority(v)
+		return nil
+	case widget.FieldTestField:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTestField(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Widget field %s", name)
@@ -506,6 +557,9 @@ func (m *WidgetMutation) ResetField(name string) error {
 		return nil
 	case widget.FieldPriority:
 		m.ResetPriority()
+		return nil
+	case widget.FieldTestField:
+		m.ResetTestField()
 		return nil
 	}
 	return fmt.Errorf("unknown Widget field %s", name)
