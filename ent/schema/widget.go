@@ -26,6 +26,7 @@ func (Widget) Fields() []ent.Field {
 			Default("draft"),
 		field.Int("priority").
 			Default(0),
+		field.Text("test_field"),
 	}
 }
 
