@@ -1,4 +1,0 @@
-ent/**.go linguist-generated=true
-ent/generate.go linguist-generated=false
-ent/schema/*.go linguist-generated=false
-
