@@ -5,7 +5,6 @@ go 1.16
 require (
 	cloud.google.com/go/storage v1.16.0 // indirect
 	entgo.io/ent v0.9.1
-	github.com/99designs/gqlgen v0.13.0
 	github.com/a8m/enter v0.0.0-20210413065805-0a4b784db97c
 	github.com/benbjohnson/litestream v0.3.5
 	github.com/jackc/pgx/v4 v4.13.0
