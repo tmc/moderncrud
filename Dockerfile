@@ -11,7 +11,7 @@ RUN go install -v ./cmd/...
 
 FROM golang:1.17
 WORKDIR /go/src/github.com/tmc/moderncrud
-COPY --from=builder /go/bin/moderncrud-server /go/bin/
+COPY --from=builder /go/bin/ /go/bin/
 COPY ./scripts/ ./scripts/
 
 CMD ["./scripts/entrypoint.sh"]
