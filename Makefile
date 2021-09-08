@@ -8,6 +8,10 @@ test: deps ## Run tests
 generate: ## Run code generation
 	go generate ./...
 
+.PHONY: image
+image: ## Build docker image
+	docker buildx build -t moderncrud .
+
 .PHONY: deps
 deps: ## Install dependencies.
 	@command -v go > /dev/null || brew install go
