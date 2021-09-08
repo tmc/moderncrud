@@ -96,7 +96,7 @@ func newConnection() *ent.Client {
 
 	// dbURI := fmt.Sprintf("user=%s password=%s database=%s host=%s/%s", dbUser, dbPwd, dbName, socketDir, instanceConnectionName)
 
-	db, err := sql.Open("sqlite3", "file:db.sqlite?_fk=1&busy_timeout=10")
+	db, err := sql.Open("sqlite3", "file:db.sqlite?_fk=1&busy_timeout=1000")
 	if err != nil {
 		log.Fatal(err)
 	}
